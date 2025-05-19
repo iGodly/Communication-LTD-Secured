@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Communication_LTD Information System
 
 A secure web-based information system for Communication_LTD, built with Node.js, Express, React, and MySQL.
@@ -59,7 +58,4 @@ communication-ltd/
 
 ## License
 
-ISC 
-=======
-# Communication_LTD
->>>>>>> cfbf45da29591b00c655367310a05951fb2465c9
+ISC
