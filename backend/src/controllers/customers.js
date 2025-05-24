@@ -44,11 +44,12 @@ async function getCustomerById(req, res) {
 // Create new customer
 async function createCustomer(req, res) {
   try {
-    const { name, sector, contactEmail, contactPhone } = req.body;
+    const { name, sector } = req.body;
 
+    // SECURE: Using parameterized queries to prevent SQL injection
     const [result] = await pool.query(
-      'INSERT INTO customers (name, sector, contact_email, contact_phone) VALUES (?, ?, ?, ?)',
-      [name, sector, contactEmail, contactPhone]
+      'INSERT INTO customers (name, sector) VALUES (?, ?)',
+      [name, sector]
     );
 
     const [newCustomer] = await pool.query(
@@ -67,7 +68,7 @@ async function createCustomer(req, res) {
 // Update customer
 async function updateCustomer(req, res) {
   try {
-    const { name, sector, contactEmail, contactPhone } = req.body;
+    const { name, sector } = req.body;
     const customerId = req.params.id;
 
     // Check if customer exists
@@ -84,11 +85,9 @@ async function updateCustomer(req, res) {
     await pool.query(
       `UPDATE customers 
        SET name = COALESCE(?, name),
-           sector = COALESCE(?, sector),
-           contact_email = COALESCE(?, contact_email),
-           contact_phone = COALESCE(?, contact_phone)
+           sector = COALESCE(?, sector)
        WHERE id = ?`,
-      [name, sector, contactEmail, contactPhone, customerId]
+      [name, sector, customerId]
     );
 
     // Get updated customer

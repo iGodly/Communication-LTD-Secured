@@ -1,6 +1,6 @@
 const express = require('express');
 const { body } = require('express-validator');
-const { validateRequest, sanitizeRequest } = require('../middleware/validation');
+const { validateRequest } = require('../middleware/validation');
 const { protect } = require('../middleware/auth');
 const {
   register,
@@ -35,7 +35,6 @@ router.post('/register',
       .isLength({ min: 8 })
       .withMessage('Password must be at least 8 characters long')
   ],
-  sanitizeRequest,
   validateRequest,
   register
 );
@@ -54,7 +53,6 @@ router.post('/login',
       .notEmpty()
       .withMessage('Password is required')
   ],
-  sanitizeRequest,
   validateRequest,
   login
 );
@@ -73,7 +71,6 @@ router.post('/change-password',
       .isLength({ min: 8 })
       .withMessage('New password must be at least 8 characters long')
   ],
-  sanitizeRequest,
   validateRequest,
   changePassword
 );
@@ -87,7 +84,6 @@ router.post('/forgot-password',
       .withMessage('Please enter a valid email')
       .normalizeEmail()
   ],
-  sanitizeRequest,
   validateRequest,
   forgotPassword
 );
@@ -100,7 +96,6 @@ router.post('/verify-reset-token',
       .notEmpty()
       .withMessage('Reset token is required')
   ],
-  sanitizeRequest,
   validateRequest,
   verifyResetToken
 );
@@ -118,7 +113,6 @@ router.post('/reset-password',
       .isLength({ min: 8 })
       .withMessage('New password must be at least 8 characters long')
   ],
-  sanitizeRequest,
   validateRequest,
   resetPassword
 );

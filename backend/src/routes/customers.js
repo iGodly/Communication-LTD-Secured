@@ -1,6 +1,7 @@
+console.log('[SQL DEBUG] customers route loaded');
 const express = require('express');
 const { body } = require('express-validator');
-const { validateRequest, sanitizeRequest } = require('../middleware/validation');
+const { validateRequest } = require('../middleware/validation');
 const { protect } = require('../middleware/auth');
 const {
   getAllCustomers,
@@ -31,23 +32,9 @@ router.post('/',
     
     body('sector')
       .trim()
-      .isLength({ min: 2, max: 50 })
-      .withMessage('Sector must be between 2 and 50 characters'),
-    
-    body('contactEmail')
-      .optional()
-      .trim()
-      .isEmail()
-      .withMessage('Please enter a valid email address')
-      .normalizeEmail(),
-    
-    body('contactPhone')
-      .optional()
-      .trim()
-      .matches(/^\+?[\d\s-]{10,}$/)
-      .withMessage('Please enter a valid phone number')
+      .isLength({ min: 2, max: 100 })
+      .withMessage('Sector must be between 2 and 100 characters')
   ],
-  sanitizeRequest,
   validateRequest,
   createCustomer
 );
@@ -64,23 +51,9 @@ router.put('/:id',
     body('sector')
       .optional()
       .trim()
-      .isLength({ min: 2, max: 50 })
-      .withMessage('Sector must be between 2 and 50 characters'),
-    
-    body('contactEmail')
-      .optional()
-      .trim()
-      .isEmail()
-      .withMessage('Please enter a valid email address')
-      .normalizeEmail(),
-    
-    body('contactPhone')
-      .optional()
-      .trim()
-      .matches(/^\+?[\d\s-]{10,}$/)
-      .withMessage('Please enter a valid phone number')
+      .isLength({ min: 2, max: 100 })
+      .withMessage('Sector must be between 2 and 100 characters')
   ],
-  sanitizeRequest,
   validateRequest,
   updateCustomer
 );

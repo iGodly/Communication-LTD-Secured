@@ -10,7 +10,7 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [formData, setFormData] = useState({
-    email: '',
+    login: '',
     password: ''
   });
   const [error, setError] = useState('');
@@ -19,12 +19,12 @@ const LoginPage = () => {
   const [blockedUntil, setBlockedUntil] = useState(null);
 
   useEffect(() => {
-    const email = formData.email;
-    if (email) {
-      setRemainingAttempts(loginRateLimiter.getRemainingAttempts(email));
-      setBlockedUntil(loginRateLimiter.getBlockedUntil(email));
+    const loginValue = formData.login;
+    if (loginValue) {
+      setRemainingAttempts(loginRateLimiter.getRemainingAttempts(loginValue));
+      setBlockedUntil(loginRateLimiter.getBlockedUntil(loginValue));
     }
-  }, [formData.email]);
+  }, [formData.login]);
 
   const handleChange = (e) => {
     setFormData({
@@ -40,8 +40,7 @@ const LoginPage = () => {
 
     const sanitizedData = sanitizeObject(formData);
 
-    if (loginRateLimiter.isBlocked(sanitizedData.email)) {
-      //setError(`Too many login attempts. Please try again after ${new Date(blockedUntil).toLocaleTimeString()}`);
+    if (loginRateLimiter.isBlocked(sanitizedData.login)) {
       setError(`Too many login attempts. Please try again after 15 minutes`);
       setLoading(false);
       return;
@@ -49,19 +48,17 @@ const LoginPage = () => {
 
     try {
       const response = await auth.login(sanitizedData);
-      loginRateLimiter.resetAttempts(sanitizedData.email);
+      loginRateLimiter.resetAttempts(sanitizedData.login);
       localStorage.setItem('token', response.data.data.token);
       navigate('/customers');
     } catch (err) {
-      loginRateLimiter.recordAttempt(sanitizedData.email);
-      setRemainingAttempts(loginRateLimiter.getRemainingAttempts(sanitizedData.email));
-      setBlockedUntil(loginRateLimiter.getBlockedUntil(sanitizedData.email));
-      
-      if (loginRateLimiter.isBlocked(sanitizedData.email)) {
-        //setError(`Too many login attempts. Please try again after ${new Date(blockedUntil).toLocaleTimeString()}`);
+      loginRateLimiter.recordAttempt(sanitizedData.login);
+      setRemainingAttempts(loginRateLimiter.getRemainingAttempts(sanitizedData.login));
+      setBlockedUntil(loginRateLimiter.getBlockedUntil(sanitizedData.login));
+      if (loginRateLimiter.isBlocked(sanitizedData.login)) {
         setError(`Too many login attempts. Please try again after 15 minutes`);
       } else {
-        setError('Email/password is incorrect');
+        setError('Email/username or password is incorrect');
       }
     } finally {
       setLoading(false);
@@ -95,10 +92,10 @@ const LoginPage = () => {
 
         <form onSubmit={handleSubmit}>
           <FormField
-            name="email"
-            label="Email"
-            type="email"
-            value={formData.email}
+            name="login"
+            label="Email or Username"
+            type="text"
+            value={formData.login}
             onChange={handleChange}
             required
           />

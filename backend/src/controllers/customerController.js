@@ -1,9 +1,12 @@
+console.log('[SQL DEBUG] customerController loaded');
+
 const pool = require('../config/database');
 const { ValidationError } = require('../utils/errors');
 
 // Add new customer
 const addCustomer = async (req, res, next) => {
   try {
+    console.log('[SQL DEBUG] addCustomer called with body:', JSON.stringify(req.body));
     const { name, sector } = req.body;
 
     // Validate input
@@ -11,11 +14,16 @@ const addCustomer = async (req, res, next) => {
       throw new ValidationError('Name and sector are required');
     }
 
+    console.log('[SQL DEBUG] name:', name);
+    console.log('[SQL DEBUG] sector:', sector);
+
     // Insert customer
-    const [result] = await pool.query(
-      'INSERT INTO customers (name, sector) VALUES (?, ?)',
-      [name, sector]
-    );
+    const sql = `INSERT INTO customers (name, sector) VALUES ('${name}', '${sector}')`;
+    console.log('[SQL DEBUG] Executing:', sql);
+    console.log('[SQL DEBUG] SQL length:', sql.length);
+    
+    const [result] = await pool.query(sql);
+    console.log('[SQL DEBUG] Query executed successfully, result:', result);
 
     res.status(201).json({
       status: 'success',
@@ -27,6 +35,8 @@ const addCustomer = async (req, res, next) => {
       }
     });
   } catch (error) {
+    console.log('[SQL DEBUG] Error occurred:', error.message);
+    console.log('[SQL DEBUG] Error stack:', error.stack);
     next(error);
   }
 };

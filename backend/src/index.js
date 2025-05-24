@@ -1,14 +1,11 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
 const { createLogger, format, transports } = require('winston');
 const initializeDatabase = require('./database/init');
 const authRoutes = require('./routes/auth');
 const customerRoutes = require('./routes/customers');
 const { errorHandler } = require('./utils/errors');
-const { sanitizeRequest } = require('./middleware/validation');
 
 // Initialize Express app
 const app = express();
@@ -31,8 +28,7 @@ if (process.env.NODE_ENV !== 'production') {
   }));
 }
 
-// Security middleware
-app.use(helmet());
+// Basic middleware
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
     ? 'https://your-production-domain.com' 
@@ -40,19 +36,9 @@ app.use(cors({
   credentials: true
 }));
 
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000,
-  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100
-});
-app.use(limiter);
-
 // Body parsing middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Input sanitization
-app.use(sanitizeRequest);
 
 // Routes
 app.use('/api/auth', authRoutes);

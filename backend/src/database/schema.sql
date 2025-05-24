@@ -1,6 +1,6 @@
 -- Create database if not exists
-CREATE DATABASE IF NOT EXISTS communication_ltd;
-USE communication_ltd;
+CREATE DATABASE IF NOT EXISTS communication_ltd2;
+USE communication_ltd2;
 
 -- Users table
 CREATE TABLE IF NOT EXISTS users (
@@ -29,9 +29,7 @@ CREATE TABLE IF NOT EXISTS password_history (
 CREATE TABLE IF NOT EXISTS customers (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(100) NOT NULL,
-    sector VARCHAR(50) NOT NULL,
-    contact_email VARCHAR(100),
-    contact_phone VARCHAR(20),
+    sector VARCHAR(100) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );

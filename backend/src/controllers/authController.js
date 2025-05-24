@@ -10,7 +10,7 @@ const register = async (req, res, next) => {
   try {
     const { username, email, password } = req.body;
 
-    // Check if username or email already exists
+    // Check if username or email already exists - SECURE: Using parameterized query
     const [existingUsers] = await pool.query(
       'SELECT * FROM users WHERE username = ? OR email = ?',
       [username, email]
@@ -24,7 +24,7 @@ const register = async (req, res, next) => {
     validatePassword(password);
     const { hash, salt } = await hashPassword(password);
 
-    // Store user
+    // Store user - SECURE: Using parameterized query
     const [result] = await pool.query(
       'INSERT INTO users (username, email, password_hash, salt) VALUES (?, ?, ?, ?)',
       [username, email, hash, salt]
@@ -43,12 +43,12 @@ const register = async (req, res, next) => {
 // Login user
 const login = async (req, res, next) => {
   try {
-    const { email, password } = req.body;
+    const { login, password } = req.body;
 
-    // Find user
+    // Find user - SECURE: Using parameterized query
     const [users] = await pool.query(
-      'SELECT * FROM users WHERE email = ?',
-      [email]
+      'SELECT * FROM users WHERE email = ? OR username = ?',
+      [login, login]
     );
 
     if (users.length === 0) {
@@ -110,8 +110,23 @@ const changePassword = async (req, res, next) => {
       throw new AuthenticationError('Current password is incorrect');
     }
 
-    // Validate and hash new password
-    validatePassword(newPassword);
+    // Check if new password is same as current password
+    const isSamePassword = await verifyPassword(newPassword, user.password_hash, user.salt);
+    if (isSamePassword) {
+      throw new ValidationError('New password must be different from current password');
+    }
+
+    try {
+      // Validate new password requirements
+      validatePassword(newPassword);
+    } catch (error) {
+      if (error instanceof PasswordError) {
+        throw new ValidationError(error.message);
+      }
+      throw error;
+    }
+
+    // Hash new password
     const { hash, salt } = await hashPassword(newPassword);
 
     // Check password history
@@ -124,7 +139,7 @@ const changePassword = async (req, res, next) => {
     for (const history of passwordHistory) {
       const isMatch = await verifyPassword(newPassword, history.password_hash, history.salt);
       if (isMatch) {
-        throw new ValidationError('Cannot reuse any of your last 5 passwords');
+        throw new ValidationError('Cannot reuse any of your last 3 passwords');
       }
     }
 

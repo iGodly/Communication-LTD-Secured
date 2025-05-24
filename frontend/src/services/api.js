@@ -6,8 +6,7 @@ const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 const api = axios.create({
   baseURL: API_URL,
   headers: {
-    'Content-Type': 'application/json',
-    ...securityConfig.headers
+    'Content-Type': 'application/json'
   }
 });
 
@@ -46,7 +45,8 @@ export const auth = {
 
 export const customers = {
   add: (data) => api.post('/customers', data),
-  getLatest: () => api.get('/customers/latest')
+  getLatest: () => api.get('/customers/latest'),
+  getAll: () => api.get('/customers'),
 };
 
 export default api; 
